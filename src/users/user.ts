@@ -25,7 +25,7 @@ export async function user(userId: number) {
     res.json({ result: lastReceivedMessage });
   });
 
-  _user.get("/getlastSentMessage", (req, res) => {
+  _user.get("/getLastSentMessage", (req, res) => {
     res.json({ result: lastSentMessage });
   });
 
@@ -41,6 +41,28 @@ export async function user(userId: number) {
     }
   });
 
+  _user.post("/sendMessage", async (req, res) => {
+    const { message, destinationUserId } = req.body;
+
+    if (!message || destinationUserId === undefined) {
+      res.status(400).json({ error: "Données invalides" });
+      return;
+    }
+
+    try {
+      // Logique pour envoyer le message à l'utilisateur de destination
+      const destinationPort = BASE_USER_PORT + destinationUserId;
+      await sendMessage(destinationPort, message);
+      lastSentMessage = message;
+      res.status(200).json({ success: true });
+    } catch (error) {
+      console.error("Erreur lors de l'envoi du message :", error);
+      res
+        .status(500)
+        .json({ error: "Une erreur est survenue lors de l'envoi du message" });
+    }
+  });
+
   const server = _user.listen(BASE_USER_PORT + userId, () => {
     console.log(
       `User ${userId} is listening on port ${BASE_USER_PORT + userId}`
@@ -48,4 +70,14 @@ export async function user(userId: number) {
   });
 
   return server;
+}
+
+async function sendMessage(userPort: number, message: string) {
+  await fetch(`http://localhost:${userPort}/message`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ message }),
+  });
 }
