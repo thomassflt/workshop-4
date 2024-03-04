@@ -4,8 +4,6 @@ import {
   BASE_USER_PORT,
   REGISTRY_PORT,
 } from "../../src/config";
-import { launchNetwork } from "../../src/index";
-import { GetNodeRegistryBody } from "../../src/registry/registry";
 import {
   createRandomSymmetricKey,
   exportPrvKey,
@@ -20,6 +18,8 @@ import {
   symDecrypt,
   symEncrypt,
 } from "../../src/crypto";
+import { launchNetwork } from "../../src/index";
+import { GetNodeRegistryBody } from "../../src/registry/registry";
 const { validateEncryption } = require("./utils");
 
 const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
